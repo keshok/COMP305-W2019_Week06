@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     //private bool canJump = false;
     private Animator anim;
     private bool isFacingRight = true;
+    private bool isGrounded = false;
 
     // Reserved function. Runs only once when the object is created.
     // Used for initialization
@@ -24,11 +25,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space)) // Listens to my space bar key being pressed
-        {
-            rBody.AddForce(new Vector2(0, jumpForce));
-            //canJump = false;
-        }
+
     }
 
     /// <summary>
@@ -41,8 +38,15 @@ public class PlayerController : MonoBehaviour
 
         rBody.velocity = new Vector2(horiz * speed, rBody.velocity.y);
 
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) // Listens to my space bar key being pressed
+        {
+            rBody.AddForce(new Vector2(0, jumpForce));
+            //canJump = false;
+            isGrounded = false;
+        }
+
         // Check direction of the player
-        if(horiz < 0 && isFacingRight)
+        if (horiz < 0 && isFacingRight)
         {
             Flip();
         }
@@ -53,6 +57,14 @@ public class PlayerController : MonoBehaviour
 
         // Update Animator Information
         anim.SetFloat("Speed", Mathf.Abs(horiz));
+    }
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
     }
 
     private void Flip()
